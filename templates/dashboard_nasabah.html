@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Nasabah — Equinox Banking{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 3rem;">
+        <div class="nav-brand">
+            <i class="fa-solid fa-building-columns"></i>
+            Equinox Banking
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="nav-link active">Dashboard</a>
+            <a href="{% url 'support' %}" class="nav-link">Support</a>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <span class="role-badge role-nasabah"><i class="fa-solid fa-user"></i> Nasabah</span>
+        <div class="user-avatar">{{ request.user.first_name|make_list|first }}</div>
+        <span style="font-size: 0.875rem; font-weight: 500;">{{ request.user.first_name }}</span>
+        <a href="{% url 'logout' %}" class="nav-icon" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;">Selamat Datang, {{ request.user.first_name }}!</h1>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">Ambil nomor antrean dan pantau status layanan secara real-time.</p>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 600px;">
+        <div class="stat-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span class="stat-label">CUSTOMER SERVICE</span>
+                <div class="stat-icon" style="background: #f3e8ff; color: #8b5cf6;"><i class="fa-solid fa-headset"></i></div>
+            </div>
+            <h3 class="stat-value"><span id="cs_wait">0</span> <span style="font-size: 0.875rem; font-weight: 400; color: var(--text-muted);">menunggu</span></h3>
+            <div class="stat-footer">Loket 1, 2, 3</div>
+        </div>
+        <div class="stat-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span class="stat-label">KASIR</span>
+                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fa-solid fa-cash-register"></i></div>
+            </div>
+            <h3 class="stat-value"><span id="kasir_wait">0</span> <span style="font-size: 0.875rem; font-weight: 400; color: var(--text-muted);">menunggu</span></h3>
+            <div class="stat-footer">Loket 4, 5, 6</div>
+        </div>
+    </div>
+
+    <div class="main-dashboard-grid">
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div class="big-queue-card">
+                <div class="badge-calling">
+                    <i class="fa-solid fa-bullhorn" style="margin-right: 0.5rem;"></i> Sedang Dipanggil
+                </div>
+                <div style="font-size: 0.875rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 2rem;">Nomor Antrean</div>
+                <div class="queue-number" id="big_queue_number">-</div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 1.5rem 0;">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Menuju Loket</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-dark);" id="big_queue_loket">-</div>
+                    </div>
+                    <div style="border-left: 1px solid var(--border-color); padding-left: 1rem;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Layanan</div>
+                        <div style="font-size: 1.25rem; font-weight: 600;" id="big_queue_type">-</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" style="flex: 1; padding: 1rem; font-size: 1rem;" onclick="takeQueue('CS')">
+                        <i class="fa-solid fa-headset" style="margin-right: 0.5rem;"></i> Ambil Antrean CS
+                    </button>
+                    <button class="btn btn-secondary" style="flex: 1; padding: 1rem; font-size: 1rem;" onclick="takeQueue('K')">
+                        <i class="fa-solid fa-cash-register" style="margin-right: 0.5rem;"></i> Ambil Antrean Kasir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification area for taken queue -->
+            <div id="my_queue_notification" style="display: none;" class="card" >
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #dcfce7; color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 1.125rem;">Nomor Antrean Anda: <span id="my_queue_number" style="color: var(--primary-color);"></span></div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">Harap tunggu sampai nomor Anda dipanggil.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="promo-card">
+                <div style="flex: 1; padding: 3rem;">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Perbankan Tanpa Antre?</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.6;">
+                        Gunakan aplikasi mobile <strong>Equinox</strong> untuk booking nomor antrean dari rumah atau lakukan transaksi digital secara langsung tanpa perlu ke cabang.
+                    </p>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn" style="background: white; color: var(--secondary-color);">Pelajari Lebih Lanjut</button>
+                        <button class="btn" style="background: rgba(255,255,255,0.1); color: white;">
+                            <i class="fa-solid fa-download" style="margin-right: 0.5rem;"></i> Download App
+                        </button>
+                    </div>
+                </div>
+                <div style="flex: 1; background: linear-gradient(135deg, rgba(5,150,105,0.2) 0%, rgba(15,23,42,0) 100%); display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 8rem; color: rgba(255,255,255,0.1); transform: rotate(15deg);"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="queue-list-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.125rem;">Antrean Terakhir</h3>
+            </div>
+            <div style="display: flex; flex-direction: column;" id="recent_queues_list">
+                <!-- Filled by JS -->
+            </div>
+            <div class="realtime-indicator"><i class="fa-solid fa-circle-check"></i> Sistem Real-Time Aktif</div>
+        </div>
+    </div>
+</div>
+
+<footer class="dashboard-footer">
+    <div>
+        <div style="font-weight: 700; color: var(--secondary-color); margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-building-columns"></i> Equinox Financial Group
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">&copy; 2024 Equinox Financial Group. Secure Member FDIC.</div>
+    </div>
+    <div style="display: flex; gap: 1.5rem; font-size: 0.75rem;">
+        <a href="{% url 'support' %}" style="color: var(--text-muted);">Help Center</a>
+        <a href="{% url 'support' %}" style="color: var(--text-muted);">Contact Security</a>
+    </div>
+</footer>
+
+<input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+<script>
+    function fetchData() {
+        fetch('/api/dashboard-data/')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('cs_wait').innerText = data.cs_wait;
+                document.getElementById('kasir_wait').innerText = data.kasir_wait;
+
+                if (data.current_cs !== "-") {
+                    document.getElementById('big_queue_number').innerText = data.current_cs;
+                    document.getElementById('big_queue_loket').innerText = data.current_cs_loket;
+                    document.getElementById('big_queue_type').innerText = 'Customer Service';
+                } else if (data.current_kasir !== "-") {
+                    document.getElementById('big_queue_number').innerText = data.current_kasir;
+                    document.getElementById('big_queue_loket').innerText = data.current_kasir_loket;
+                    document.getElementById('big_queue_type').innerText = 'Kasir';
+                } else {
+                    document.getElementById('big_queue_number').innerText = '-';
+                    document.getElementById('big_queue_loket').innerText = '-';
+                    document.getElementById('big_queue_type').innerText = '-';
+                }
+
+                let qList = "";
+                data.recent_queues.forEach(q => {
+                    qList += `
+                    <div class="queue-item">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="queue-avatar">${q.type === 'CS' ? 'CS' : 'K'}</div>
+                            <div>
+                                <div style="font-weight: 600;">${q.num}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${q.type} • Selesai</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">${q.time}</div>
+                    </div>`;
+                });
+                document.getElementById('recent_queues_list').innerHTML = qList || '<div style="text-align:center; color:var(--text-muted); padding:2rem; font-size:0.875rem;">Belum ada antrean selesai</div>';
+            });
+    }
+
+    function takeQueue(type) {
+        fetch('/api/take-queue/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.getElementById('csrf_token').value
+            },
+            body: JSON.stringify({ type: type })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                const notif = document.getElementById('my_queue_notification');
+                document.getElementById('my_queue_number').innerText = data.number;
+                notif.style.display = 'block';
+                notif.style.animation = 'fadeSlideIn 0.5s ease';
+            }
+            fetchData();
+        });
+    }
+
+    setInterval(fetchData, 2000);
+    fetchData();
+</script>
+{% endblock %}

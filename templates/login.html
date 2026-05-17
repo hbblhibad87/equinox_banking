@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}Login — Equinox Banking{% endblock %}
+
 {% block content %}
 <div class="auth-wrapper">
     <div class="auth-header">
@@ -13,7 +15,7 @@
     <div class="card auth-card">
         <div style="text-align: center; margin-bottom: 2rem;">
             <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">Selamat Datang</h2>
-            <p style="color: var(--text-muted); font-size: 0.875rem;">Silakan masuk ke akun pegawai Anda.</p>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">Silakan masuk ke akun Anda.</p>
         </div>
 
         {% if messages %}
@@ -27,10 +29,10 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
-                <label class="form-label">Email/ID Pegawai</label>
+                <label class="form-label">Username / ID Pegawai</label>
                 <div class="input-icon-wrapper">
-                    <i class="fa-regular fa-envelope"></i>
-                    <input type="text" name="username" class="form-control" placeholder="Masukkan ID atau Email" required>
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" name="username" class="form-control" placeholder="Masukkan username" required>
                 </div>
             </div>
 
@@ -63,6 +65,43 @@
         </div>
     </div>
 
+    <!-- Demo Credentials Card -->
+    <div class="card" style="width: 100%; max-width: 400px; margin-top: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);">
+        <div style="font-size: 0.75rem; font-weight: 600; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+            <i class="fa-solid fa-flask"></i> Demo Accounts
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8rem;">
+            <div class="demo-credential" onclick="fillLogin('admin', 'admin123')">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="role-badge role-admin" style="font-size: 0.65rem; padding: 0.2rem 0.5rem;"><i class="fa-solid fa-shield-halved"></i> Admin</span>
+                    <span style="color: var(--text-muted);">admin@equinoxbanking.com</span>
+                </div>
+                <code style="font-size: 0.7rem; background: #f1f5f9; padding: 0.15rem 0.5rem; border-radius: 0.25rem;">admin / admin123</code>
+            </div>
+            <div class="demo-credential" onclick="fillLogin('teller01', 'teller123')">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="role-badge role-teller" style="font-size: 0.65rem; padding: 0.2rem 0.5rem;"><i class="fa-solid fa-cash-register"></i> Teller</span>
+                    <span style="color: var(--text-muted);">teller@equinoxbanking.com</span>
+                </div>
+                <code style="font-size: 0.7rem; background: #f1f5f9; padding: 0.15rem 0.5rem; border-radius: 0.25rem;">teller01 / teller123</code>
+            </div>
+            <div class="demo-credential" onclick="fillLogin('cs01', 'cs123')">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="role-badge role-cs" style="font-size: 0.65rem; padding: 0.2rem 0.5rem;"><i class="fa-solid fa-headset"></i> CS</span>
+                    <span style="color: var(--text-muted);">cs@equinoxbanking.com</span>
+                </div>
+                <code style="font-size: 0.7rem; background: #f1f5f9; padding: 0.15rem 0.5rem; border-radius: 0.25rem;">cs01 / cs123</code>
+            </div>
+            <div class="demo-credential" onclick="fillLogin('nasabah01', 'nasabah123')">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="role-badge role-nasabah" style="font-size: 0.65rem; padding: 0.2rem 0.5rem;"><i class="fa-solid fa-user"></i> Nasabah</span>
+                    <span style="color: var(--text-muted);">nasabah@equinoxbanking.com</span>
+                </div>
+                <code style="font-size: 0.7rem; background: #f1f5f9; padding: 0.15rem 0.5rem; border-radius: 0.25rem;">nasabah01 / nasabah123</code>
+            </div>
+        </div>
+    </div>
+
     <div style="display: flex; gap: 2rem; margin-top: 3rem; color: var(--text-muted); font-size: 0.75rem; font-weight: 500; text-transform: uppercase;">
         <span><i class="fa-solid fa-shield-halved" style="margin-right: 0.5rem;"></i> Secure Access</span>
         <span><i class="fa-solid fa-lock" style="margin-right: 0.5rem;"></i> SSL Encrypted</span>
@@ -83,6 +122,7 @@
 </footer>
 
 <script>
+    // Toggle password visibility
     document.querySelectorAll('.toggle-password').forEach(function(icon) {
         icon.addEventListener('click', function() {
             var input = this.previousElementSibling;
@@ -97,5 +137,11 @@
             }
         });
     });
+
+    // Auto-fill demo credentials on click
+    function fillLogin(username, password) {
+        document.querySelector('input[name="username"]').value = username;
+        document.querySelector('input[name="password"]').value = password;
+    }
 </script>
 {% endblock %}

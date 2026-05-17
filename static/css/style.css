@@ -74,6 +74,33 @@ a:hover {
     box-shadow: var(--shadow-md);
 }
 
+/* Role-specific call buttons */
+.btn-call-teller {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.btn-call-teller:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.35);
+}
+
+.btn-call-cs {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.btn-call-cs:hover {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35);
+}
+
 .form-group {
     margin-bottom: 1.25rem;
 }
@@ -132,7 +159,57 @@ input[type="text"]::-ms-clear {
     padding: 2rem;
 }
 
-/* Nav */
+/* ===================== */
+/* Role Badges           */
+/* ===================== */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.role-admin {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+}
+
+.role-teller {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+}
+
+.role-cs {
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    color: #5b21b6;
+}
+
+.role-nasabah {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--secondary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* ===================== */
+/* Nav                   */
+/* ===================== */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -180,7 +257,7 @@ input[type="text"]::-ms-clear {
 .nav-actions {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .nav-icon {
@@ -194,7 +271,9 @@ input[type="text"]::-ms-clear {
     color: var(--primary-color);
 }
 
-/* Footer */
+/* ===================== */
+/* Footer                */
+/* ===================== */
 .footer {
     padding: 2rem;
     display: flex;
@@ -210,14 +289,26 @@ input[type="text"]::-ms-clear {
     gap: 1.5rem;
 }
 
-/* Auth Layout */
+.dashboard-footer {
+    margin-top: 4rem;
+    padding: 2rem 4rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+}
+
+/* ===================== */
+/* Auth Layout           */
+/* ===================== */
 .auth-wrapper {
     display: flex;
     flex-direction: column;
     flex: 1;
     align-items: center;
     justify-content: flex-start;
-    padding-top: 8rem;
+    padding-top: 5rem;
     padding-bottom: 4rem;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -233,7 +324,27 @@ input[type="text"]::-ms-clear {
     max-width: 400px;
 }
 
-/* Split Layout */
+/* Demo Credentials */
+.demo-credential {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.demo-credential:hover {
+    background: #f1f5f9;
+    border-color: var(--border-color);
+    transform: translateX(4px);
+}
+
+/* ===================== */
+/* Split Layout          */
+/* ===================== */
 .split-layout {
     display: flex;
     min-height: 100vh;
@@ -275,7 +386,9 @@ input[type="text"]::-ms-clear {
     max-width: 450px;
 }
 
-/* Dashboard Grid */
+/* ===================== */
+/* Dashboard Grid        */
+/* ===================== */
 .dashboard-container {
     padding: 2rem;
     max-width: 1200px;
@@ -296,11 +409,48 @@ input[type="text"]::-ms-clear {
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .stat-card.dark {
     background: var(--secondary-color);
     color: white;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.stat-footer {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .main-dashboard-grid {
@@ -327,6 +477,16 @@ input[type="text"]::-ms-clear {
     width: 100%;
     height: 6px;
     background: var(--primary-color);
+}
+
+.badge-calling {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #dcfce7;
+    color: var(--primary-dark);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 2rem;
 }
 
 .queue-number {
@@ -366,9 +526,32 @@ input[type="text"]::-ms-clear {
     align-items: center;
     justify-content: center;
     font-weight: 600;
+    font-size: 0.75rem;
 }
 
-/* Support Page */
+.realtime-indicator {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.75rem;
+    color: #10b981;
+    font-weight: 600;
+}
+
+/* Promo / Info Card */
+.promo-card {
+    background: var(--secondary-color);
+    border-radius: 1rem;
+    color: white;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ===================== */
+/* Support Page          */
+/* ===================== */
 .support-header {
     text-align: center;
     padding: 4rem 2rem;
@@ -441,4 +624,23 @@ input[type="text"]::-ms-clear {
     border-radius: 1rem;
     box-shadow: var(--shadow-lg);
     width: 300px;
+}
+
+/* ===================== */
+/* Animations            */
+/* ===================== */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
