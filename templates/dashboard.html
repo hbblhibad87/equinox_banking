@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 3rem;">
+        <div class="nav-brand">
+            <i class="fa-solid fa-building-columns"></i>
+            Equinox Banking
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="nav-link active">Dashboard</a>
+            <a href="#" class="nav-link">Queue Status</a>
+            <a href="{% url 'support' %}" class="nav-link">Support</a>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <i class="fa-regular fa-bell nav-icon"></i>
+        <i class="fa-solid fa-gear nav-icon"></i>
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--secondary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600;">
+            AD
+        </div>
+        <a href="{% url 'logout' %}" class="nav-icon" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--primary-color); letter-spacing: 1px;">CUSTOMER SERVICE</span>
+                <i class="fa-solid fa-headset" style="color: var(--primary-color);"></i>
+            </div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">CS-042</h3>
+            <div style="font-size: 0.875rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color);"></div>
+                Aktif: Loket 1, 2, 3
+            </div>
+        </div>
+        <div class="stat-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--primary-color); letter-spacing: 1px;">KASIR</span>
+                <i class="fa-solid fa-cash-register" style="color: var(--primary-color);"></i>
+            </div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">K-128</h3>
+            <div style="font-size: 0.875rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color);"></div>
+                Aktif: Loket 4, 5, 6
+            </div>
+        </div>
+        <div class="stat-card dark" style="cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='var(--secondary-color)'" onclick="callQueue('CS')">
+            <div style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem;">Menunggu (CS)</div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;"><span id="cs_wait">0</span> Nasabah</h3>
+            <div style="font-size: 0.75rem; color: #10b981; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-bullhorn"></i> Klik Panggil (Loket 1)
+            </div>
+        </div>
+        <div class="stat-card dark" style="cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='var(--secondary-color)'" onclick="callQueue('K')">
+            <div style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem;">Menunggu (Kasir)</div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;"><span id="kasir_wait">0</span> Nasabah</h3>
+            <div style="font-size: 0.75rem; color: #10b981; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-bullhorn"></i> Klik Panggil (Loket 4)
+            </div>
+        </div>
+    </div>
+
+    <div class="main-dashboard-grid">
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div class="big-queue-card">
+                <div style="display: inline-block; padding: 0.5rem 1rem; background: #dcfce7; color: var(--primary-dark); font-size: 0.875rem; font-weight: 600; border-radius: 2rem; margin-bottom: 2rem;">
+                    <i class="fa-solid fa-bullhorn" style="margin-right: 0.5rem;"></i> Sedang Dipanggil
+                </div>
+                <div style="font-size: 0.875rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase;">Nomor Antrean</div>
+                <div class="queue-number" id="big_queue_number">-</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 1.5rem 0;">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Menuju Loket</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-dark);" id="big_queue_loket">-</div>
+                    </div>
+                    <div style="border-left: 1px solid var(--border-color);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Layanan</div>
+                        <div style="font-size: 1.25rem; font-weight: 600;" id="big_queue_type">-</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" style="flex: 1; padding: 1rem; font-size: 1rem;" onclick="takeQueue('CS')">
+                        Ambil Antrean CS
+                    </button>
+                    <button class="btn btn-secondary" style="flex: 1; padding: 1rem; font-size: 1rem;" onclick="takeQueue('K')">
+                        Ambil Antrean Kasir
+                    </button>
+                </div>
+            </div>
+
+            <div style="background: var(--secondary-color); border-radius: 1rem; color: white; display: flex; overflow: hidden; position: relative;">
+                <div style="flex: 1; padding: 3rem;">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Perbankan Tanpa Antre?</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.6;">
+                        Gunakan aplikasi mobile <strong>Equinox</strong> untuk booking nomor antrean dari rumah atau lakukan transaksi digital secara langsung tanpa perlu ke cabang.
+                    </p>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn" style="background: white; color: var(--secondary-color);">Pelajari Lebih Lanjut</button>
+                        <button class="btn" style="background: rgba(255,255,255,0.1); color: white;">
+                            <i class="fa-solid fa-download" style="margin-right: 0.5rem;"></i> Download App
+                        </button>
+                    </div>
+                </div>
+                <div style="flex: 1; background: linear-gradient(135deg, rgba(5,150,105,0.2) 0%, rgba(15,23,42,0) 100%); display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 8rem; color: rgba(255,255,255,0.1); transform: rotate(15deg);"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="queue-list-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.125rem;">Antrean Terakhir</h3>
+                <a href="#" style="font-size: 0.875rem; font-weight: 500;">Lihat Semua <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i></a>
+            </div>
+
+            <div style="display: flex; flex-direction: column;" id="recent_queues_list">
+                <!-- Terisi dari JS -->
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: #10b981; font-weight: 600;">
+                <i class="fa-solid fa-circle-check"></i> Sistem Real-Time Aktif
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer style="margin-top: 4rem; padding: 2rem 4rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: white;">
+    <div>
+        <div style="font-weight: 700; color: var(--secondary-color); margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-building-columns"></i> Equinox Financial Group
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">&copy; 2024 Equinox Financial Group. Secure Member FDIC.</div>
+    </div>
+    <div style="display: flex; gap: 1.5rem; font-size: 0.75rem;">
+        <a href="#" style="color: var(--text-muted);">Privacy Policy</a>
+        <a href="#" style="color: var(--text-muted);">Terms of Service</a>
+        <a href="#" style="color: var(--text-muted);">Help Center</a>
+        <a href="#" style="color: var(--text-muted);">Contact Security</a>
+    </div>
+</footer>
+
+<input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+<script>
+    function fetchData() {
+        fetch('/api/dashboard-data/')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('cs_wait').innerText = data.cs_wait;
+                document.getElementById('kasir_wait').innerText = data.kasir_wait;
+                
+                if (data.current_cs !== "-") {
+                    document.getElementById('big_queue_number').innerText = data.current_cs;
+                    document.getElementById('big_queue_loket').innerText = data.current_cs_loket;
+                    document.getElementById('big_queue_type').innerText = 'Customer Service';
+                } else if (data.current_kasir !== "-") {
+                    document.getElementById('big_queue_number').innerText = data.current_kasir;
+                    document.getElementById('big_queue_loket').innerText = data.current_kasir_loket;
+                    document.getElementById('big_queue_type').innerText = 'Kasir';
+                } else {
+                    document.getElementById('big_queue_number').innerText = "-";
+                    document.getElementById('big_queue_loket').innerText = "-";
+                    document.getElementById('big_queue_type').innerText = "-";
+                }
+                
+                let qList = "";
+                data.recent_queues.forEach(q => {
+                    qList += `
+                    <div class="queue-item">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="queue-avatar">${q.type === 'CS' ? 'CS' : 'K'}</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 1rem;">${q.num}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${q.type} • Selesai</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">${q.time}</div>
+                    </div>`;
+                });
+                document.getElementById('recent_queues_list').innerHTML = qList;
+            });
+    }
+
+    function takeQueue(type) {
+        fetch('/api/take-queue/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.getElementById('csrf_token').value
+            },
+            body: JSON.stringify({ type: type })
+        }).then(() => fetchData());
+    }
+
+    function callQueue(type) {
+        let loket = type === 'CS' ? 1 : 4;
+        fetch('/api/call-queue/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.getElementById('csrf_token').value
+            },
+            body: JSON.stringify({ type: type, loket: loket })
+        }).then(() => fetchData());
+    }
+
+    // Polling real-time every 2 seconds
+    setInterval(fetchData, 2000);
+    fetchData(); // Initial load
+</script>
+{% endblock %}

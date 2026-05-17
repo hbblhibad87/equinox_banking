@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 3rem;">
+        <div class="nav-brand">
+            <i class="fa-solid fa-building-columns"></i>
+            Equinox Banking
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+            <a href="#" class="nav-link">Queue Status</a>
+            <a href="{% url 'support' %}" class="nav-link active">Support</a>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <i class="fa-regular fa-bell nav-icon"></i>
+        <i class="fa-solid fa-gear nav-icon"></i>
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--secondary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600;">
+            AD
+        </div>
+        <a href="{% url 'logout' %}" class="nav-icon" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+    </div>
+</nav>
+
+<div class="dashboard-container" style="max-width: 1000px; padding-top: 3rem;">
+    <div style="margin-bottom: 3rem;">
+        <div style="display: inline-block; padding: 0.5rem 1rem; background: #dcfce7; color: var(--primary-dark); font-size: 0.75rem; font-weight: 600; border-radius: 2rem; margin-bottom: 1.5rem;">
+            <i class="fa-solid fa-headset" style="margin-right: 0.5rem;"></i> Pusat Bantuan Resmi
+        </div>
+        <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">Halo, Apa yang bisa kami bantu?</h1>
+        <p style="color: var(--text-muted); font-size: 1rem; max-width: 600px; line-height: 1.6;">
+            Kami siap membantu setiap kebutuhan perbankan Anda. Tim spesialis kami tersedia 24/7 untuk memastikan keamanan dan kenyamanan transaksi Anda.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 4rem;">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fa-regular fa-building"></i></div>
+                <div>
+                    <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Alamat Kantor Pusat</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">
+                        Equinox Financial Tower, Lantai 42<br>
+                        Jl. Jenderal Sudirman Kav. 52-53<br>
+                        Jakarta Selatan, 12190
+                    </p>
+                </div>
+            </div>
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fa-regular fa-envelope"></i></div>
+                <div>
+                    <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Email Dukungan</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">
+                        support@equinoxbanking.com<br>
+                        corporate@equinoxbanking.com
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
+                <div>
+                    <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Nomor Telepon</h3>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+                        Layanan Pelanggan: 1500-888<br>
+                        Internasional: +62 21 555 0123
+                    </p>
+                    <a href="#" style="font-size: 0.875rem; font-weight: 600;">Hubungi Sekarang <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i></a>
+                </div>
+            </div>
+            <div class="contact-card dark">
+                <div class="contact-icon" style="background: rgba(255,255,255,0.1); color: white;"><i class="fa-regular fa-comments"></i></div>
+                <div>
+                    <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Live Chat</h3>
+                    <p style="font-size: 0.875rem; color: #94a3b8; line-height: 1.6; margin-bottom: 1rem;">
+                        Bicara langsung dengan agen kami untuk respon instan.
+                    </p>
+                    <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Mulai Chat</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="grid-row: span 2; display: flex; flex-direction: column;">
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Kirim Pesan</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;">Bagikan pertanyaan atau masukan Anda di sini.</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #dcfce7; color: #166534; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; text-align: center;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" style="flex: 1; display: flex; flex-direction: column;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase;">Nama Lengkap</label>
+                    <input type="text" name="name" class="form-control" placeholder="Masukkan nama lengkap Anda" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase;">Kategori Bantuan</label>
+                    <select name="category" class="form-control" required style="appearance: none; background: white url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22%2364748b%22 viewBox=%220 0 16 16%22><path d=%22M8 11.5l-5-5h10l-5 5z%22/></svg>') no-repeat right 1rem center;">
+                        <option value="Masalah Transaksi">Masalah Transaksi</option>
+                        <option value="Informasi Rekening">Informasi Rekening</option>
+                        <option value="Kartu Kredit">Kartu Kredit</option>  
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase;">Detail Pesan</label>
+                    <textarea name="detail" class="form-control" rows="5" placeholder="Ceritakan detail masalah atau pertanyaan Anda..." required style="resize: none; height: 100%;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: auto;">
+                    Kirim Pesan Sekarang <i class="fa-regular fa-paper-plane" style="margin-left: 0.5rem;"></i>
+                </button>
+                <div style="text-align: center; margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                    <span style="color: var(--primary-color);">●</span> Respon rata-rata: <span style="font-weight: 600;">1 Jam 45 Menit</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+        <div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Lokasi Strategis</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">Kunjungi kantor kami untuk layanan perbankan eksklusif.</p>
+        </div>
+        <a href="#" style="font-weight: 600; font-size: 0.875rem;"><i class="fa-solid fa-location-arrow" style="margin-right: 0.5rem;"></i> Dapatkan Rute</a>
+    </div>
+
+    <div class="map-card" style="background: var(--secondary-color); display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-map-location-dot" style="font-size: 5rem; color: rgba(255,255,255,0.1);"></i>
+        <div class="map-overlay">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-weight: 600; font-size: 0.875rem; color: var(--primary-dark);">
+                <i class="fa-solid fa-location-dot"></i> Equinox HQ - Priority Lounge
+            </div>
+            <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                Nikmati fasilitas Priority Banking dan konsultasi manajemen kekayaan secara personal.
+            </p>
+            <div style="display: flex; gap: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                <span><i class="fa-regular fa-clock"></i> 09:00 - 17:00</span>
+                <span><i class="fa-solid fa-square-parking"></i> PARKIR GRATIS</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer style="margin-top: 4rem; background: var(--secondary-color); color: white; padding: 4rem 2rem 2rem 2rem;">
+    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+        <div>
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Equinox Financial</h2>
+            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">
+                Membangun masa depan finansial yang aman dan berkelanjutan melalui inovasi perbankan digital kelas dunia.
+            </p>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fa-brands fa-linkedin-in"></i></div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fa-brands fa-twitter"></i></div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fa-brands fa-instagram"></i></div>
+            </div>
+        </div>
+        <div>
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: var(--primary-color); letter-spacing: 1px; margin-bottom: 1.5rem;">PERUSAHAAN</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.875rem; color: #94a3b8;">
+                <a href="#" style="color: inherit;">Tentang Kami</a>
+                <a href="#" style="color: inherit;">Karir</a>
+                <a href="#" style="color: inherit;">Berita</a>
+            </div>
+        </div>
+        <div>
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: var(--primary-color); letter-spacing: 1px; margin-bottom: 1.5rem;">LAYANAN</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.875rem; color: #94a3b8;">
+                <a href="#" style="color: inherit;">Personal Banking</a>
+                <a href="#" style="color: inherit;">Priority Banking</a>
+                <a href="#" style="color: inherit;">Investasi</a>
+            </div>
+        </div>
+        <div>
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: var(--primary-color); letter-spacing: 1px; margin-bottom: 1.5rem;">BANTUAN</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.875rem; color: #94a3b8;">
+                <a href="#" style="color: inherit;">Keamanan</a>
+                <a href="#" style="color: inherit;">Syarat & Ketentuan</a>
+                <a href="#" style="color: inherit;">FAQ</a>
+            </div>
+        </div>
+    </div>
+    <div style="max-width: 1200px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #94a3b8;">
+        <div>&copy; 2024 Equinox Financial Group. Berizin dan diawasi oleh OJK. Member LPS.</div>
+        <div style="display: flex; gap: 1.5rem;">
+            <span><i class="fa-solid fa-shield-halved"></i> Secure Banking</span>
+            <span><i class="fa-solid fa-certificate"></i> ISO 27001</span>
+        </div>
+    </div>
+</footer>
+{% endblock %}

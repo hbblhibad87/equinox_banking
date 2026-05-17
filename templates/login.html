@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-header">
+        <div style="background: var(--secondary-color); color: white; width: 64px; height: 64px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1rem;">
+            <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <h1 style="font-size: 2rem; font-weight: 700; color: var(--secondary-color);">Equinox Banking</h1>
+        <p style="color: var(--text-muted); font-size: 0.875rem; letter-spacing: 1px; text-transform: uppercase;">Queue Management System</p>
+    </div>
+
+    <div class="card auth-card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">Selamat Datang</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">Silakan masuk ke akun pegawai Anda.</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div style="background: #fee2e2; color: #dc2626; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; text-align: center;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Email/ID Pegawai</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="text" name="username" class="form-control" placeholder="Masukkan ID atau Email" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <label class="form-label" style="margin-bottom: 0;">Kata Sandi</label>
+                    <a href="{% url 'support' %}" style="font-size: 0.75rem; font-weight: 500;">Lupa Kata Sandi?</a>
+                </div>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    <i class="fa-regular fa-eye toggle-password" style="left: auto; right: 1rem; cursor: pointer; z-index: 10;"></i>
+                </div>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem;">
+                <input type="checkbox" id="remember" style="accent-color: var(--primary-color);">
+                <label for="remember" style="font-size: 0.875rem; color: var(--text-muted);">Ingat saya di perangkat ini</label>
+            </div>
+
+            <button type="submit" class="btn btn-secondary" style="width: 100%; justify-content: center; margin-bottom: 1.5rem;">
+                Masuk <i class="fa-solid fa-arrow-right" style="margin-left: 0.5rem;"></i>
+            </button>
+        </form>
+
+        <div style="text-align: center; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <p style="font-size: 0.875rem; color: var(--text-muted);">
+                Belum punya akses? <a href="{% url 'register' %}" style="font-weight: 600;">Daftar Akun Baru</a>
+            </p>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 2rem; margin-top: 3rem; color: var(--text-muted); font-size: 0.75rem; font-weight: 500; text-transform: uppercase;">
+        <span><i class="fa-solid fa-shield-halved" style="margin-right: 0.5rem;"></i> Secure Access</span>
+        <span><i class="fa-solid fa-lock" style="margin-right: 0.5rem;"></i> SSL Encrypted</span>
+    </div>
+</div>
+
+<footer class="footer" style="width: 100%;">
+    <div style="font-weight: 600; color: var(--text-main);">
+        Equinox Banking<br>
+        <span style="font-weight: 400; color: var(--text-muted);">&copy; 2024 Equinox Financial Group. Secure Member FDIC.</span>
+    </div>
+    <div class="footer-links">
+        <a href="{% url 'support' %}" style="color: var(--text-muted);">Privacy Policy</a>
+        <a href="{% url 'support' %}" style="color: var(--text-muted);">Terms of Service</a>
+        <a href="{% url 'support' %}" style="color: var(--text-muted);">Help Center</a>
+        <a href="{% url 'support' %}" style="color: var(--text-muted);">Contact Security</a>
+    </div>
+</footer>
+
+<script>
+    document.querySelectorAll('.toggle-password').forEach(function(icon) {
+        icon.addEventListener('click', function() {
+            var input = this.previousElementSibling;
+            if (input.type === "password") {
+                input.type = "text";
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+    });
+</script>
+{% endblock %}
