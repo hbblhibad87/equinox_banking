@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}KYC Profile - Bank{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-id-card"></i> Lengkapi Profil KYC
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Verifikasi Identitas (KYC)</strong> diperlukan untuk meningkatkan limit transaksi dan keamanan akun Anda.
+                    </div>
+
+                    {% if kyc.status == 'approved' %}
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle"></i> Profil KYC Anda telah diverifikasi!
+                    </div>
+                    {% elif kyc.status == 'rejected' %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-times-circle"></i> Profil KYC Anda ditolak: <strong>{{ kyc.rejection_reason }}</strong>
+                    </div>
+                    {% elif kyc.status == 'under_review' %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-hourglass-half"></i> Profil KYC Anda sedang diproses. Harap tunggu.
+                    </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <h5 class="mb-3 mt-4">Informasi Pribadi</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="full_name" class="form-label">Nama Lengkap</label>
+                                    <input type="text" class="form-control" id="full_name" name="full_name" 
+                                           value="{{ kyc.full_name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
+                                           value="{{ kyc.date_of_birth|date:'Y-m-d' }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4">Alamat</h5>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Alamat Lengkap</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required>{{ kyc.address }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="city" class="form-label">Kota/Kabupaten</label>
+                                    <input type="text" class="form-control" id="city" name="city" value="{{ kyc.city }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="province" class="form-label">Provinsi</label>
+                                    <input type="text" class="form-control" id="province" name="province" value="{{ kyc.province }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="postal_code" class="form-label">Kode Pos</label>
+                                    <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ kyc.postal_code }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4">Dokumen Identitas</h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="document_type" class="form-label">Jenis Dokumen</label>
+                                    <select class="form-control" id="document_type" name="document_type" required>
+                                        <option value="">-- Pilih Jenis Dokumen --</option>
+                                        {% for value, label in document_types %}
+                                        <option value="{{ value }}" {% if kyc.document_type == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="document_number" class="form-label">Nomor Dokumen</label>
+                                    <input type="text" class="form-control" id="document_number" name="document_number" 
+                                           value="{{ kyc.document_number }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mt-3" role="alert">
+                            <i class="fas fa-camera"></i>
+                            <strong>Catatan:</strong> Upload dokumen dan foto selfie dapat dilakukan melalui aplikasi mobile.
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" {% if kyc.status == 'approved' %}disabled{% endif %}>
+                                <i class="fas fa-save"></i> Simpan & Kirim untuk Verifikasi
+                            </button>
+                            <a href="{% url 'dashboard_nasabah' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

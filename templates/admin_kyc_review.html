@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin KYC Review - Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-id-card"></i> KYC Verification Review
+            </h2>
+        </div>
+    </div>
+
+    {% if kyc_submissions %}
+    <div class="row">
+        {% for kyc in kyc_submissions %}
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user"></i> {{ kyc.user.first_name }} ({{ kyc.user.username }})
+                        </h5>
+                        <span class="badge bg-secondary">{{ kyc.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-muted">Personal Information</h6>
+                        <p class="mb-2">
+                            <strong>Nama Lengkap:</strong> {{ kyc.full_name }}<br>
+                            <strong>DOB:</strong> {{ kyc.date_of_birth }}<br>
+                            <strong>Email:</strong> {{ kyc.user.email }}
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted">Alamat</h6>
+                        <p class="mb-0 small">
+                            {{ kyc.address }}<br>
+                            {{ kyc.city }}, {{ kyc.province }} {{ kyc.postal_code }}
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted">Document</h6>
+                        <p class="mb-0 small">
+                            <strong>Jenis:</strong> {{ kyc.get_document_type_display }}<br>
+                            <strong>Nomor:</strong> <code>{{ kyc.document_number }}</code>
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted">Submitted</h6>
+                        <small>{{ kyc.created_at|date:'d/m/Y H:i' }}</small>
+                    </div>
+
+                    <hr>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="kyc_id" value="{{ kyc.id }}">
+                        
+                        <div class="mb-3">
+                            <label for="rejection_reason_{{ kyc.id }}" class="form-label">Alasan Penolakan (jika ditolak)</label>
+                            <textarea class="form-control" id="rejection_reason_{{ kyc.id }}" name="rejection_reason" rows="2"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm" onclick="return confirm('Reject KYC?')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center" role="alert">
+        <i class="fas fa-check-circle"></i> <strong>Semua KYC telah diverifikasi!</strong>
+    </div>
+    {% endif %}
+
+    <hr class="my-4">
+    <div class="text-center">
+        <a href="{% url 'admin_analytics' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Analytics
+        </a>
+    </div>
+</div>
+{% endblock %}

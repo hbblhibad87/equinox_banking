@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Export Laporan Mutasi - Bank{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-download"></i> Export Laporan Mutasi Rekening
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Download laporan mutasi rekening Anda</strong> dalam format CSV atau PDF untuk keperluan administrasi, pajak, atau dokumen lainnya.
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <h5 class="mb-3">Pilih Format</h5>
+                        <div class="mb-3">
+                            {% for value, label in formats %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="format_{{ value }}" name="format" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
+                                <label class="form-check-label" for="format_{{ value }}">
+                                    {% if value == 'csv' %}
+                                    <i class="fas fa-file-csv"></i> CSV (Excel)
+                                    {% else %}
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                    {% endif %}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Filter Periode</h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="start_date" class="form-label">Dari Tanggal</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date">
+                                    <small class="text-muted">Kosongkan untuk mulai dari awal</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="end_date" class="form-label">Sampai Tanggal</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date">
+                                    <small class="text-muted">Kosongkan untuk sampai sekarang</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">Informasi Rekening</h6>
+                                <p class="mb-0">
+                                    <strong>Rekening:</strong> {{ account.account_number }}<br>
+                                    <strong>Nama:</strong> {{ user.first_name }}<br>
+                                    <strong>Saldo Saat Ini:</strong> Rp {{ account.balance|floatformat:0 }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-download"></i> Download Laporan
+                            </button>
+                            <a href="{% url 'mutasi' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali ke Mutasi
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt"></i> Data Anda aman dan terenkripsi. Laporan ini hanya dapat diunduh oleh pemilik rekening.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

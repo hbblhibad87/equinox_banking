@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}Pusat Bantuan — Equinox Banking{% endblock %}
+{% block content %}
+<nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 3rem;">
+        <div class="nav-brand"><i class="fa-solid fa-building-columns"></i> Equinox Banking</div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard_nasabah' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'mutasi' %}" class="nav-link">Mutasi</a>
+            <a href="{% url 'transfer' %}" class="nav-link">Transfer</a>
+            <a href="{% url 'tiket' %}" class="nav-link active">Bantuan</a>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <span class="role-badge role-nasabah"><i class="fa-solid fa-user"></i> Nasabah</span>
+        <div class="user-avatar">{{ request.user.first_name|make_list|first }}</div>
+        <span style="font-size: 0.875rem; font-weight: 500;">{{ request.user.first_name }}</span>
+        <a href="{% url 'logout' %}" class="nav-icon" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'dashboard_nasabah' %}" style="color: var(--text-muted); font-size: 0.875rem;"><i class="fa-solid fa-chevron-left"></i> Dashboard</a>
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0 0.25rem;">Pusat Bantuan</h1>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">Kirim pertanyaan atau laporkan kendala kepada tim CS kami.</p>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div style="padding: 1rem 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+        {% if message.tags == 'success' %}background: #dcfce7; color: #065f46; border: 1px solid #bbf7d0;
+        {% else %}background: #fee2e2; color: #7f1d1d; border: 1px solid #fecaca;{% endif %}">
+        <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+        <!-- Form Tiket Baru -->
+        <div class="card">
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-ticket" style="color: var(--primary-color);"></i> Buat Tiket Baru
+            </h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Kategori Masalah</label>
+                    <select name="category" class="form-control" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        {% for val, label in category_choices %}
+                        <option value="{{ val }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi Masalah</label>
+                    <textarea name="detail" class="form-control" rows="6" placeholder="Jelaskan masalah atau pertanyaan Anda secara detail..." required style="resize: vertical;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem;">
+                    <i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i> Kirim Tiket
+                </button>
+            </form>
+        </div>
+
+        <!-- Right Panel -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Contact Options -->
+            <div class="card">
+                <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Cara Lain Menghubungi Kami</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: #f8fafc;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #dcfce7; color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 600;">Call Center 24/7</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">1500-888</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: #f8fafc;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #dbeafe; color: #3b82f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 600;">Email Support</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">cs@equinoxbank.id</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: #f8fafc;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #ede9fe; color: #8b5cf6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa-solid fa-comment-dots"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 600;">Live Chat</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Senin–Jumat, 08:00–21:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riwayat Tiket -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="font-size: 0.9rem; font-weight: 600;">Riwayat Tiket Anda</h4>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">{{ user_tickets|length }} tiket</span>
+                </div>
+                {% if user_tickets %}
+                {% for ticket in user_tickets %}
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <div style="font-size: 0.875rem; font-weight: 500;">
+                            {% for val, label in category_choices %}{% if val == ticket.category %}{{ label }}{% endif %}{% endfor %}
+                        </div>
+                        <span style="font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 2rem;
+                            {% if ticket.status == 'open' %}background: #fef3c7; color: #92400e;
+                            {% elif ticket.status == 'in_progress' %}background: #dbeafe; color: #1e40af;
+                            {% else %}background: #dcfce7; color: #065f46;{% endif %}">
+                            {{ ticket.get_status_display }}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ ticket.detail }}</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">{{ ticket.created_at|date:"d M Y, H:i" }}</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="padding: 2.5rem; text-align: center; color: var(--text-muted);">
+                    <i class="fa-solid fa-ticket" style="font-size: 2.5rem; opacity: 0.2; display: block; margin-bottom: 0.75rem;"></i>
+                    <div style="font-size: 0.875rem;">Belum ada tiket yang dibuat</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="dashboard-footer">
+    <div>
+        <div style="font-weight: 700; color: var(--secondary-color); margin-bottom: 0.5rem;"><i class="fa-solid fa-building-columns"></i> Equinox Financial Group</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">&copy; 2024 Equinox Financial Group. Secure Member FDIC.</div>
+    </div>
+</footer>
+{% endblock %}

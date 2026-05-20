@@ -9,7 +9,6 @@
         </div>
         <div class="nav-links">
             <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
-            <a href="#" class="nav-link">Queue Status</a>
             <a href="{% url 'support' %}" class="nav-link active">Support</a>
         </div>
     </div>
@@ -17,7 +16,7 @@
         <i class="fa-regular fa-bell nav-icon"></i>
         <i class="fa-solid fa-gear nav-icon"></i>
         <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--secondary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600;">
-            AD
+            {{ request.user.first_name|make_list|first|upper }}
         </div>
         <a href="{% url 'logout' %}" class="nav-icon" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
     </div>

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Verifikasi Transfer - Bank{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h3 class="card-title text-center mb-4 text-primary">
+                        <i class="fas fa-lock"></i> Verifikasi Transfer
+                    </h3>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <strong>Informasi Transfer:</strong>
+                        <ul class="mb-0">
+                            <li>Penerima: <strong>{{ transfer_data.dest_account_name }}</strong></li>
+                            <li>Rekening: <strong>{{ transfer_data.dest_account_number }}</strong></li>
+                            <li>Jumlah: <strong>Rp {{ transfer_data.amount }}</strong></li>
+                            <li>Biaya: <strong>Rp {{ transfer_data.fee }}</strong></li>
+                            <li>Total: <strong class="text-danger">Rp {{ transfer_data.total }}</strong></li>
+                        </ul>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="otp_code" class="form-label">Kode OTP</label>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-lg text-center" 
+                                id="otp_code" 
+                                name="otp_code" 
+                                placeholder="Masukkan 6 digit OTP"
+                                pattern="[0-9]{6}"
+                                maxlength="6"
+                                required
+                                autofocus
+                            >
+                            <small class="text-muted">Kode OTP telah dikirim ke email Anda</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check"></i> Verifikasi & Lanjutkan Transfer
+                            </button>
+                            <a href="{% url 'transfer' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+                    <small class="text-muted d-block text-center">
+                        Kode OTP berlaku selama 10 menit
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control-lg {
+    font-size: 1.5rem;
+    letter-spacing: 0.5em;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Fraud Management - Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-shield-alt"></i> Fraud Alert Management
+            </h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Unresolved Alerts</h6>
+                    <h3 class="mb-0">{{ unresolved_count }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Total Alerts</h6>
+                    <h3 class="mb-0">{{ alerts|length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if alerts %}
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-exclamation-triangle"></i> All Fraud Alerts
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Waktu</th>
+                            <th>User</th>
+                            <th>Alert Type</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in alerts %}
+                        <tr {% if not alert.is_resolved %}class="table-warning"{% endif %}>
+                            <td><small>{{ alert.created_at|date:'d/m/Y H:i' }}</small></td>
+                            <td>
+                                <strong>{{ alert.user.username }}</strong><br>
+                                <small class="text-muted">{{ alert.user.first_name }}</small>
+                            </td>
+                            <td>
+                                {% if alert.alert_type == 'unusual_amount' %}
+                                <span class="badge bg-danger">Unusual Amount</span>
+                                {% elif alert.alert_type == 'rapid_transfers' %}
+                                <span class="badge bg-danger">Rapid Transfers</span>
+                                {% elif alert.alert_type == 'failed_login_attempts' %}
+                                <span class="badge bg-warning">Failed Logins</span>
+                                {% else %}
+                                <span class="badge bg-info">{{ alert.get_alert_type_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ alert.description|truncatewords:15 }}</small>
+                            </td>
+                            <td>
+                                {% if alert.is_resolved %}
+                                <span class="badge bg-success">Resolved</span>
+                                {% else %}
+                                <span class="badge bg-danger">Active</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#actionModal{{ alert.id }}">
+                                    <i class="fas fa-tasks"></i> Action
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Action Modal -->
+                        <div class="modal fade" id="actionModal{{ alert.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title">Alert Action - {{ alert.user.username }}</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="alert_id" value="{{ alert.id }}">
+                                            
+                                            {% if not alert.is_resolved %}
+                                            <div class="mb-3">
+                                                <label for="action_taken_{{ alert.id }}" class="form-label">Action Taken</label>
+                                                <textarea class="form-control" id="action_taken_{{ alert.id }}" name="action_taken" rows="3"></textarea>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Pilih Aksi</label>
+                                                <div class="d-grid gap-2">
+                                                    <button type="submit" name="action" value="mark_resolved" class="btn btn-success">
+                                                        <i class="fas fa-check"></i> Mark as Resolved
+                                                    </button>
+                                                    <button type="submit" name="action" value="lock_account" class="btn btn-danger" onclick="return confirm('Lock account?')">
+                                                        <i class="fas fa-lock"></i> Lock User Account
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div class="alert alert-success" role="alert">
+                                                <i class="fas fa-check-circle"></i> This alert has been resolved.
+                                            </div>
+                                            {% if alert.action_taken %}
+                                            <div class="alert alert-info" role="alert">
+                                                <strong>Action Taken:</strong><br>
+                                                {{ alert.action_taken }}
+                                            </div>
+                                            {% endif %}
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-success text-center" role="alert">
+        <i class="fas fa-check-circle"></i> <strong>Tidak ada fraud alerts!</strong>
+    </div>
+    {% endif %}
+
+    <hr class="my-4">
+    <div class="text-center">
+        <a href="{% url 'admin_analytics' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Analytics
+        </a>
+    </div>
+</div>
+{% endblock %}

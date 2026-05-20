@@ -103,13 +103,42 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'id'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 
 USE_TZ = True
+
+
+# =====================
+# Session Configuration
+# =====================
+# Session expires when browser is closed — forces fresh login each session
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Maximum session age: 8 hours (in seconds)
+SESSION_COOKIE_AGE = 60 * 60 * 8
+# Prevent session fixation attacks
+SESSION_SAVE_EVERY_REQUEST = False
+
+# Redirect after login/logout
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+
+# =====================
+# Email Configuration
+# =====================
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # For production
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'  # Change this to your email
+EMAIL_HOST_PASSWORD = 'your-app-password'  # Use Gmail app password for security
+DEFAULT_FROM_EMAIL = 'noreply@bankindonesia.com'
 
 
 # Static files (CSS, JavaScript, Images)

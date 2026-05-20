@@ -10,8 +10,10 @@
             Equinox Banking
         </div>
         <div class="nav-links">
-            <a href="{% url 'dashboard' %}" class="nav-link active">Dashboard</a>
-            <a href="{% url 'support' %}" class="nav-link">Support</a>
+            <a href="{% url 'dashboard_nasabah' %}" class="nav-link active">Dashboard</a>
+            <a href="{% url 'mutasi' %}" class="nav-link">Mutasi</a>
+            <a href="{% url 'transfer' %}" class="nav-link">Transfer</a>
+            <a href="{% url 'tiket' %}" class="nav-link">Bantuan</a>
         </div>
     </div>
     <div class="nav-actions">
@@ -25,30 +27,129 @@
 <div class="dashboard-container">
     <div style="margin-bottom: 2rem;">
         <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;">Selamat Datang, {{ request.user.first_name }}!</h1>
-        <p style="color: var(--text-muted); font-size: 0.875rem;">Ambil nomor antrean dan pantau status layanan secara real-time.</p>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">Kelola keuangan Anda dengan mudah dan aman.</p>
     </div>
 
-    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 600px;">
-        <div class="stat-card">
+    <!-- Financial Summary Cards -->
+    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2rem;">
+        <div class="stat-card dark" style="background: linear-gradient(135deg, #0f172a, #1e293b);">
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                <span class="stat-label">CUSTOMER SERVICE</span>
-                <div class="stat-icon" style="background: #f3e8ff; color: #8b5cf6;"><i class="fa-solid fa-headset"></i></div>
+                <span class="stat-label" style="color: #94a3b8;">TOTAL SALDO</span>
+                <div class="stat-icon" style="background: rgba(5,150,105,0.2); color: #10b981;">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
             </div>
-            <h3 class="stat-value"><span id="cs_wait">0</span> <span style="font-size: 0.875rem; font-weight: 400; color: var(--text-muted);">menunggu</span></h3>
-            <div class="stat-footer">Loket 1, 2, 3</div>
+            <h3 class="stat-value" style="color: white; font-size: 1.5rem;">
+                Rp <span id="balance_display">{{ account.balance|floatformat:0 }}</span>
+            </h3>
+            <div class="stat-footer" style="color: #64748b;">
+                <i class="fa-solid fa-credit-card" style="font-size: 0.65rem;"></i>
+                No. Rek: {{ account.account_number }}
+            </div>
         </div>
         <div class="stat-card">
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                <span class="stat-label">KASIR</span>
-                <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fa-solid fa-cash-register"></i></div>
+                <span class="stat-label">PEMASUKAN BULAN INI</span>
+                <div class="stat-icon" style="background: #dcfce7; color: #059669;">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                </div>
             </div>
-            <h3 class="stat-value"><span id="kasir_wait">0</span> <span style="font-size: 0.875rem; font-weight: 400; color: var(--text-muted);">menunggu</span></h3>
-            <div class="stat-footer">Loket 4, 5, 6</div>
+            <h3 class="stat-value" style="color: #059669; font-size: 1.5rem;">Rp {{ monthly_in|floatformat:0 }}</h3>
+            <div class="stat-footer"><i class="fa-solid fa-circle" style="color: #10b981; font-size: 0.5rem;"></i> Kredit & Transfer Masuk</div>
+        </div>
+        <div class="stat-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span class="stat-label">PENGELUARAN BULAN INI</span>
+                <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
+                    <i class="fa-solid fa-arrow-trend-down"></i>
+                </div>
+            </div>
+            <h3 class="stat-value" style="color: #dc2626; font-size: 1.5rem;">Rp {{ monthly_out|floatformat:0 }}</h3>
+            <div class="stat-footer"><i class="fa-solid fa-circle" style="color: #ef4444; font-size: 0.5rem;"></i> Debit & Transfer Keluar</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Aksi Cepat</h2>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;">
+            <a href="{% url 'transfer' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <span>Transfer</span>
+            </a>
+            <a href="{% url 'mutasi' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <span>Mutasi</span>
+            </a>
+            <a href="{% url 'recipients' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+                    <i class="fa-solid fa-address-book"></i>
+                </div>
+                <span>Penerima</span>
+            </a>
+            <a href="{% url 'kyc_profile' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <span>KYC</span>
+            </a>
+            <a href="{% url 'scheduled_transfer' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <span>Transfer Otomatis</span>
+            </a>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
+            <a href="{% url 'statement_export' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
+                    <i class="fa-solid fa-download"></i>
+                </div>
+                <span>Export</span>
+            </a>
+            <a href="{% url 'fraud_alerts' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <i class="fa-solid fa-shield-alt"></i>
+                </div>
+                <span>Security</span>
+            </a>
+            <a href="{% url 'audit_log' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+                    <i class="fa-solid fa-history"></i>
+                </div>
+                <span>Riwayat</span>
+            </a>
+            <a href="{% url 'notification_preference' %}" class="quick-action-btn">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #a855f7, #9333ea);">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <span>Notifikasi</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Queue notification area -->
+    <div id="my_queue_notification" style="display: none;" class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: #dcfce7; color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div>
+                <div style="font-weight: 600; font-size: 1.125rem;">Nomor Antrean Anda: <span id="my_queue_number" style="color: var(--primary-color);"></span></div>
+                <div style="font-size: 0.875rem; color: var(--text-muted);">Harap tunggu sampai nomor Anda dipanggil.</div>
+            </div>
         </div>
     </div>
 
     <div class="main-dashboard-grid">
-        <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <!-- Left: Queue Monitor + Recent Tx -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Queue Monitor -->
             <div class="big-queue-card">
                 <div class="badge-calling">
                     <i class="fa-solid fa-bullhorn" style="margin-right: 0.5rem;"></i> Sedang Dipanggil
@@ -56,7 +157,7 @@
                 <div style="font-size: 0.875rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 2rem;">Nomor Antrean</div>
                 <div class="queue-number" id="big_queue_number">-</div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 1.5rem 0;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 1.5rem 0;">
                     <div>
                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Menuju Loket</div>
                         <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-dark);" id="big_queue_loket">-</div>
@@ -67,56 +168,91 @@
                     </div>
                 </div>
 
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="stat-card" style="padding: 1rem; text-align: center;">
+                        <div class="stat-label">CS MENUNGGU</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;"><span id="cs_wait">0</span></div>
+                    </div>
+                    <div class="stat-card" style="padding: 1rem; text-align: center;">
+                        <div class="stat-label">KASIR MENUNGGU</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;"><span id="kasir_wait">0</span></div>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 1rem;">
-                    <button class="btn btn-primary" style="flex: 1; padding: 1rem; font-size: 1rem;" onclick="takeQueue('CS')">
+                    <button class="btn btn-primary" style="flex: 1; padding: 0.875rem; font-size: 0.9rem;" onclick="takeQueue('CS')">
                         <i class="fa-solid fa-headset" style="margin-right: 0.5rem;"></i> Ambil Antrean CS
                     </button>
-                    <button class="btn btn-secondary" style="flex: 1; padding: 1rem; font-size: 1rem;" onclick="takeQueue('K')">
+                    <button class="btn btn-secondary" style="flex: 1; padding: 0.875rem; font-size: 0.9rem;" onclick="takeQueue('K')">
                         <i class="fa-solid fa-cash-register" style="margin-right: 0.5rem;"></i> Ambil Antrean Kasir
                     </button>
                 </div>
             </div>
 
-            <!-- Notification area for taken queue -->
-            <div id="my_queue_notification" style="display: none;" class="card" >
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #dcfce7; color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                        <i class="fa-solid fa-ticket"></i>
-                    </div>
-                    <div>
-                        <div style="font-weight: 600; font-size: 1.125rem;">Nomor Antrean Anda: <span id="my_queue_number" style="color: var(--primary-color);"></span></div>
-                        <div style="font-size: 0.875rem; color: var(--text-muted);">Harap tunggu sampai nomor Anda dipanggil.</div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Promo Card -->
             <div class="promo-card">
-                <div style="flex: 1; padding: 3rem;">
-                    <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Perbankan Tanpa Antre?</h3>
-                    <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.6;">
-                        Gunakan aplikasi mobile <strong>Equinox</strong> untuk booking nomor antrean dari rumah atau lakukan transaksi digital secara langsung tanpa perlu ke cabang.
+                <div style="flex: 1; padding: 2.5rem;">
+                    <h3 style="font-size: 1.125rem; margin-bottom: 0.75rem;">Perbankan Tanpa Antre?</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                        Gunakan fitur <strong>Transfer</strong> untuk transaksi digital secara langsung tanpa perlu ke cabang.
                     </p>
-                    <div style="display: flex; gap: 1rem;">
-                        <button class="btn" style="background: white; color: var(--secondary-color);">Pelajari Lebih Lanjut</button>
-                        <button class="btn" style="background: rgba(255,255,255,0.1); color: white;">
-                            <i class="fa-solid fa-download" style="margin-right: 0.5rem;"></i> Download App
-                        </button>
-                    </div>
+                    <a href="{% url 'transfer' %}" class="btn" style="background: white; color: var(--secondary-color); font-size: 0.875rem; padding: 0.625rem 1.25rem;">
+                        <i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i>Transfer Sekarang
+                    </a>
                 </div>
-                <div style="flex: 1; background: linear-gradient(135deg, rgba(5,150,105,0.2) 0%, rgba(15,23,42,0) 100%); display: flex; align-items: center; justify-content: center;">
-                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 8rem; color: rgba(255,255,255,0.1); transform: rotate(15deg);"></i>
+                <div style="flex: 0.5; background: linear-gradient(135deg, rgba(5,150,105,0.2) 0%, rgba(15,23,42,0) 100%); display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 6rem; color: rgba(255,255,255,0.1); transform: rotate(15deg);"></i>
                 </div>
             </div>
         </div>
 
-        <div class="queue-list-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h3 style="font-size: 1.125rem;">Antrean Terakhir</h3>
+        <!-- Right: Queue List + Recent Transactions -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Antrian Terakhir -->
+            <div class="queue-list-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem;">Antrean Terakhir</h3>
+                </div>
+                <div style="display: flex; flex-direction: column;" id="recent_queues_list">
+                    <!-- Filled by JS -->
+                </div>
+                <div class="realtime-indicator"><i class="fa-solid fa-circle-check"></i> Sistem Real-Time Aktif</div>
             </div>
-            <div style="display: flex; flex-direction: column;" id="recent_queues_list">
-                <!-- Filled by JS -->
+
+            <!-- Transaksi Terbaru -->
+            <div class="queue-list-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem;">Transaksi Terbaru</h3>
+                    <a href="{% url 'mutasi' %}" style="font-size: 0.8rem; color: var(--primary-color); font-weight: 500;">Lihat Semua →</a>
+                </div>
+                {% for tx in recent_transactions %}
+                <div class="queue-item">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                            {% if tx.transaction_type in 'credit,transfer_in' %}background: #dcfce7; color: #059669;
+                            {% else %}background: #fee2e2; color: #dc2626;{% endif %}">
+                            {% if tx.transaction_type == 'credit' or tx.transaction_type == 'transfer_in' %}
+                                <i class="fa-solid fa-arrow-down" style="font-size: 0.75rem;"></i>
+                            {% else %}
+                                <i class="fa-solid fa-arrow-up" style="font-size: 0.75rem;"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div style="font-weight: 500; font-size: 0.875rem;">{{ tx.description|truncatechars:25 }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ tx.created_at|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.875rem; {% if tx.transaction_type in 'credit,transfer_in' %}color: #059669;{% else %}color: #dc2626;{% endif %}">
+                        {% if tx.transaction_type == 'credit' or tx.transaction_type == 'transfer_in' %}+{% else %}-{% endif %}Rp {{ tx.amount|floatformat:0 }}
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.875rem;">
+                    <i class="fa-solid fa-receipt" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3; display: block;"></i>
+                    Belum ada transaksi
+                </div>
+                {% endfor %}
             </div>
-            <div class="realtime-indicator"><i class="fa-solid fa-circle-check"></i> Sistem Real-Time Aktif</div>
         </div>
     </div>
 </div>
@@ -129,13 +265,17 @@
         <div style="font-size: 0.75rem; color: var(--text-muted);">&copy; 2024 Equinox Financial Group. Secure Member FDIC.</div>
     </div>
     <div style="display: flex; gap: 1.5rem; font-size: 0.75rem;">
-        <a href="{% url 'support' %}" style="color: var(--text-muted);">Help Center</a>
+        <a href="{% url 'tiket' %}" style="color: var(--text-muted);">Help Center</a>
         <a href="{% url 'support' %}" style="color: var(--text-muted);">Contact Security</a>
     </div>
 </footer>
 
 <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 <script>
+    function formatNumber(n) {
+        return new Intl.NumberFormat('id-ID').format(n);
+    }
+
     function fetchData() {
         fetch('/api/dashboard-data/')
             .then(res => res.json())

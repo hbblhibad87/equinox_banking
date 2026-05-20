@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% block title %}Transfer Dana — Equinox Banking{% endblock %}
+{% block content %}
+<nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 3rem;">
+        <div class="nav-brand"><i class="fa-solid fa-building-columns"></i> Equinox Banking</div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard_nasabah' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'mutasi' %}" class="nav-link">Mutasi</a>
+            <a href="{% url 'transfer' %}" class="nav-link active">Transfer</a>
+            <a href="{% url 'tiket' %}" class="nav-link">Bantuan</a>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <span class="role-badge role-nasabah"><i class="fa-solid fa-user"></i> Nasabah</span>
+        <div class="user-avatar">{{ request.user.first_name|make_list|first }}</div>
+        <span style="font-size: 0.875rem; font-weight: 500;">{{ request.user.first_name }}</span>
+        <a href="{% url 'logout' %}" class="nav-icon" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+    </div>
+</nav>
+
+<div class="dashboard-container" style="max-width: 900px;">
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'dashboard_nasabah' %}" style="color: var(--text-muted); font-size: 0.875rem;"><i class="fa-solid fa-chevron-left"></i> Dashboard</a>
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0 0.25rem;">Transfer Dana</h1>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">Pindahkan dana ke sesama rekening Equinox Banking.</p>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div style="padding: 1rem 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+        {% if message.tags == 'success' %}background: #dcfce7; color: #065f46; border: 1px solid #bbf7d0;
+        {% else %}background: #fee2e2; color: #7f1d1d; border: 1px solid #fecaca;{% endif %}">
+        <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+        <!-- Transfer Form -->
+        <div class="card">
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-paper-plane" style="color: var(--primary-color);"></i> Form Transfer
+            </h3>
+            
+            <!-- Tabs for Recent Recipients -->
+            {% if recipients %}
+            <div style="margin-bottom: 1.5rem;">
+                <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Penerima Favorit</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    {% for recipient in recipients %}
+                    <button type="button" class="recipient-btn" onclick="setRecipient('{{ recipient.account_number }}', '{{ recipient.recipient_name }}')">
+                        <i class="fa-solid fa-heart" style="color: {% if recipient.is_favorite %}#ef4444{% else %}#cbd5e1{% endif %};"></i> {{ recipient.recipient_name|truncatewords:2 }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <form method="POST" id="transfer-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="send_otp">
+                
+                <div class="form-group">
+                    <label class="form-label">Nomor Rekening Tujuan</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-credit-card"></i>
+                        <input type="text" name="dest_account" id="dest_account" class="form-control" placeholder="Masukkan no. rekening tujuan" required maxlength="16">
+                    </div>
+                    <div id="dest-info" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); min-height: 1.5rem;"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Jumlah Transfer</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        <input type="text" name="amount" id="amount_input" class="form-control" placeholder="0" required>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                        <button type="button" class="quick-amount-btn" onclick="setAmount(50000)">50rb</button>
+                        <button type="button" class="quick-amount-btn" onclick="setAmount(100000)">100rb</button>
+                        <button type="button" class="quick-amount-btn" onclick="setAmount(500000)">500rb</button>
+                        <button type="button" class="quick-amount-btn" onclick="setAmount(1000000)">1jt</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Keterangan (opsional)</label>
+                    <input type="text" name="description" class="form-control" placeholder="Contoh: Bayar tagihan listrik">
+                </div>
+                <button type="button" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem;" onclick="showConfirm()">
+                    <i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i> Lanjutkan Transfer
+                </button>
+                <a href="{% url 'recipients' %}" style="display: block; text-align: center; margin-top: 1rem; font-size: 0.875rem; color: var(--primary-color); text-decoration: none;">
+                    <i class="fa-solid fa-address-book"></i> Kelola Penerima
+                </a>
+            </form>
+        </div>
+
+        <!-- Right Panel -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Account Info -->
+            <div style="background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 1.25rem; padding: 1.75rem; color: white; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(5,150,105,0.15);"></div>
+                <div style="position: relative; z-index: 1;">
+                    <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Rekening Anda</div>
+                    <div style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ account.account_number }}</div>
+                    <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem;">{{ request.user.first_name }}</div>
+                    <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Saldo Tersedia</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;">Rp {{ account.balance|floatformat:0 }}</div>
+                </div>
+            </div>
+
+            <!-- Transfer Info -->
+            <div class="card">
+                <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Informasi Transfer</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: #dcfce7; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 500;">Real-time</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Dana langsung diterima dalam hitungan detik</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: #dcfce7; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-shield"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 500;">Aman & Terenkripsi</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Transaksi dilindungi enkripsi 256-bit</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: #dcfce7; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 500;">Tanpa Biaya</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Bebas biaya untuk sesama Equinox</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirm-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center;">
+    <div class="card" style="width: 90%; max-width: 420px; animation: fadeSlideIn 0.3s ease;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: #dcfce7; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <h3 style="font-size: 1.125rem; font-weight: 700;">Konfirmasi Transfer</h3>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">Pastikan detail transfer sudah benar</p>
+        </div>
+        <div style="background: #f8fafc; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+                <span style="color: var(--text-muted);">Ke Rekening</span>
+                <span id="modal_dest" style="font-weight: 600;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+                <span style="color: var(--text-muted);">Jumlah</span>
+                <span id="modal_amount" style="font-weight: 700; color: #059669; font-size: 1rem;"></span>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+            <button class="btn" style="flex: 1; background: #f1f5f9; color: var(--text-main);" onclick="closeConfirm()">Batal</button>
+            <button class="btn btn-primary" style="flex: 1;" onclick="submitTransfer()">
+                <i class="fa-solid fa-check" style="margin-right: 0.5rem;"></i> Konfirmasi
+            </button>
+        </div>
+    </div>
+</div>
+
+<footer class="dashboard-footer">
+    <div>
+        <div style="font-weight: 700; color: var(--secondary-color); margin-bottom: 0.5rem;"><i class="fa-solid fa-building-columns"></i> Equinox Financial Group</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">&copy; 2024 Equinox Financial Group. Secure Member FDIC.</div>
+    </div>
+</footer>
+
+<script>
+function formatRupiah(number) {
+    return new Intl.NumberFormat('id-ID').format(number);
+}
+
+const amountInput = document.getElementById('amount_input');
+amountInput.addEventListener('input', function() {
+    let raw = this.value.replace(/\D/g, '');
+    if (raw) this.value = formatRupiah(parseInt(raw));
+    else this.value = '';
+});
+
+function setAmount(val) {
+    amountInput.value = formatRupiah(val);
+}
+
+function setRecipient(account, name) {
+    document.getElementById('dest_account').value = account;
+    document.getElementById('dest-info').textContent = 'Penerima: ' + name;
+    amountInput.focus();
+}
+
+function showConfirm() {
+    const dest = document.getElementById('dest_account').value.trim();
+    const amount = amountInput.value.trim();
+    if (!dest || !amount) { alert('Mohon isi semua field yang wajib.'); return; }
+    document.getElementById('modal_dest').textContent = dest;
+    document.getElementById('modal_amount').textContent = 'Rp ' + amount;
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+
+function closeConfirm() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+
+function submitTransfer() {
+    document.getElementById('transfer-form').submit();
+}
+</script>
+
+<style>
+.recipient-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    background: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.recipient-btn:hover {
+    background: #f8fafc;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+</style>
+{% endblock %}

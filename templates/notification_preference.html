@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Preferensi Notifikasi - Bank{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-bell"></i> Preferensi Notifikasi
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <h5 class="mb-3">
+                            <i class="fas fa-envelope"></i> Email Notifications
+                        </h5>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="email_on_transfer" name="email_on_transfer" {% if prefs.email_on_transfer %}checked{% endif %}>
+                            <label class="form-check-label" for="email_on_transfer">
+                                <strong>Notifikasi Transfer</strong>
+                                <br>
+                                <small class="text-muted">Terima email saat ada transfer masuk atau keluar</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="email_on_login" name="email_on_login" {% if prefs.email_on_login %}checked{% endif %}>
+                            <label class="form-check-label" for="email_on_login">
+                                <strong>Notifikasi Login</strong>
+                                <br>
+                                <small class="text-muted">Terima email untuk setiap login ke akun Anda</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="email_on_kyc" name="email_on_kyc" {% if prefs.email_on_kyc %}checked{% endif %}>
+                            <label class="form-check-label" for="email_on_kyc">
+                                <strong>Notifikasi KYC</strong>
+                                <br>
+                                <small class="text-muted">Terima update tentang status verifikasi KYC Anda</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="email_daily_summary" name="email_daily_summary" {% if prefs.email_daily_summary %}checked{% endif %}>
+                            <label class="form-check-label" for="email_daily_summary">
+                                <strong>Ringkasan Harian</strong>
+                                <br>
+                                <small class="text-muted">Terima ringkasan aktivitas transaksi harian Anda</small>
+                            </label>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">
+                            <i class="fas fa-mobile-alt"></i> SMS Notifications
+                        </h5>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="sms_on_large_transfer" name="sms_on_large_transfer" {% if prefs.sms_on_large_transfer %}checked{% endif %}>
+                            <label class="form-check-label" for="sms_on_large_transfer">
+                                <strong>SMS Transfer Besar</strong>
+                                <br>
+                                <small class="text-muted">Terima SMS saat transfer melebihi jumlah threshold</small>
+                            </label>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sms_threshold" class="form-label">Threshold Transfer (Rp)</label>
+                            <input type="number" class="form-control" id="sms_threshold" name="sms_threshold" 
+                                   value="{{ prefs.sms_threshold|floatformat:0 }}" min="0" step="100000">
+                            <small class="text-muted">SMS akan dikirim jika transfer melampaui jumlah ini</small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">
+                            <i class="fas fa-desktop"></i> Push Notifications
+                        </h5>
+
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="push_notifications" name="push_notifications" {% if prefs.push_notifications %}checked{% endif %}>
+                            <label class="form-check-label" for="push_notifications">
+                                <strong>Push Notification</strong>
+                                <br>
+                                <small class="text-muted">Terima push notification di aplikasi mobile Anda</small>
+                            </label>
+                        </div>
+
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle"></i>
+                            Pengaturan ini akan segera diterapkan. Anda dapat mengubahnya kapan saja.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Simpan Preferensi
+                            </button>
+                            <a href="{% url 'dashboard_nasabah' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

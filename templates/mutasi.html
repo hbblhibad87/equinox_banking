@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Mutasi Rekening — Equinox Banking{% endblock %}
+{% block content %}
+<nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 3rem;">
+        <div class="nav-brand"><i class="fa-solid fa-building-columns"></i> Equinox Banking</div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard_nasabah' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'mutasi' %}" class="nav-link active">Mutasi</a>
+            <a href="{% url 'transfer' %}" class="nav-link">Transfer</a>
+            <a href="{% url 'tiket' %}" class="nav-link">Bantuan</a>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <span class="role-badge role-nasabah"><i class="fa-solid fa-user"></i> Nasabah</span>
+        <div class="user-avatar">{{ request.user.first_name|make_list|first }}</div>
+        <span style="font-size: 0.875rem; font-weight: 500;">{{ request.user.first_name }}</span>
+        <a href="{% url 'logout' %}" class="nav-icon" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'dashboard_nasabah' %}" style="color: var(--text-muted); font-size: 0.875rem;"><i class="fa-solid fa-chevron-left"></i> Dashboard</a>
+        <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0 0.25rem;">Mutasi Rekening</h1>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">Riwayat transaksi masuk dan keluar secara mendetail.</p>
+    </div>
+
+    <!-- Account Banner -->
+    <div style="background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 1.25rem; padding: 2rem; margin-bottom: 1.5rem; color: white; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -40px; right: -40px; width: 150px; height: 150px; border-radius: 50%; background: rgba(5,150,105,0.15);"></div>
+        <div style="position: relative; z-index: 1;">
+            <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Rekening Tabungan</div>
+            <div style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;">Rp {{ account.balance|floatformat:0 }}</div>
+            <div style="font-size: 0.875rem; color: #94a3b8;">No. Rekening: {{ account.account_number }} &nbsp;|&nbsp; {{ request.user.first_name }}</div>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <form method="GET" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date" name="start_date" value="{{ start_date }}" class="form-control">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Tanggal Akhir</label>
+                <input type="date" name="end_date" value="{{ end_date }}" class="form-control">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Jenis Transaksi</label>
+                <select name="type" class="form-control">
+                    <option value="">Semua</option>
+                    <option value="credit" {% if tx_type == 'credit' %}selected{% endif %}>Kredit (Masuk)</option>
+                    <option value="debit" {% if tx_type == 'debit' %}selected{% endif %}>Debit (Keluar)</option>
+                    <option value="transfer_in" {% if tx_type == 'transfer_in' %}selected{% endif %}>Transfer Masuk</option>
+                    <option value="transfer_out" {% if tx_type == 'transfer_out' %}selected{% endif %}>Transfer Keluar</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.25rem;"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <a href="{% url 'mutasi' %}" class="btn" style="background: #f1f5f9; color: var(--text-main); padding: 0.75rem 1.25rem;"><i class="fa-solid fa-xmark"></i></a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Transaction Table -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1rem; font-weight: 600;"><i class="fa-solid fa-list-ul" style="margin-right: 0.5rem; color: var(--primary-color);"></i>Daftar Transaksi</h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">{{ transactions|length }} transaksi ditemukan</span>
+        </div>
+        {% if transactions %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f8fafc;">
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Tanggal</th>
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Keterangan</th>
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Jenis</th>
+                        <th style="padding: 1rem 1.5rem; text-align: right; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Jumlah</th>
+                        <th style="padding: 1rem 1.5rem; text-align: right; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for tx in transactions %}
+                <tr style="border-top: 1px solid var(--border-color); transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+                    <td style="padding: 1rem 1.5rem;">
+                        <div style="font-weight: 500; font-size: 0.875rem;">{{ tx.created_at|date:"d M Y" }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ tx.created_at|date:"H:i" }}</div>
+                    </td>
+                    <td style="padding: 1rem 1.5rem;">
+                        <div style="font-size: 0.875rem; font-weight: 500;">{{ tx.description }}</div>
+                        {% if tx.related_account %}<div style="font-size: 0.75rem; color: var(--text-muted);">Rek: {{ tx.related_account }}</div>{% endif %}
+                    </td>
+                    <td style="padding: 1rem 1.5rem;">
+                        {% if tx.transaction_type == 'credit' %}<span class="tx-badge tx-badge-in">Kredit</span>
+                        {% elif tx.transaction_type == 'debit' %}<span class="tx-badge tx-badge-out">Debit</span>
+                        {% elif tx.transaction_type == 'transfer_in' %}<span class="tx-badge tx-badge-in">Transfer Masuk</span>
+                        {% else %}<span class="tx-badge tx-badge-out">Transfer Keluar</span>{% endif %}
+                    </td>
+                    <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 600; font-size: 0.9rem; {% if tx.transaction_type == 'credit' or tx.transaction_type == 'transfer_in' %}color: #059669;{% else %}color: #dc2626;{% endif %}">
+                        {% if tx.transaction_type == 'credit' or tx.transaction_type == 'transfer_in' %}+{% else %}-{% endif %}Rp {{ tx.amount|floatformat:0 }}
+                    </td>
+                    <td style="padding: 1rem 1.5rem; text-align: right; font-size: 0.875rem; color: var(--text-muted);">Rp {{ tx.balance_after|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding: 4rem; text-align: center; color: var(--text-muted);">
+            <i class="fa-solid fa-inbox" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 1rem;"></i>
+            <div style="font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem;">Tidak ada transaksi</div>
+            <div style="font-size: 0.875rem;">Coba ubah filter atau rentang tanggal Anda.</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<footer class="dashboard-footer">
+    <div>
+        <div style="font-weight: 700; color: var(--secondary-color); margin-bottom: 0.5rem;"><i class="fa-solid fa-building-columns"></i> Equinox Financial Group</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">&copy; 2024 Equinox Financial Group. Secure Member FDIC.</div>
+    </div>
+</footer>
+{% endblock %}

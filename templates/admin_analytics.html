@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Analytics Dashboard - Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-chart-line"></i> Admin Analytics Dashboard
+            </h2>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Total Users</h6>
+                    <h3 class="mb-0">{{ total_users }}</h3>
+                    <small class="text-white-50">Active Accounts</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Total Balance</h6>
+                    <h3 class="mb-0">Rp {{ total_balance|floatformat:0 }}</h3>
+                    <small class="text-white-50">All Accounts</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Today Transactions</h6>
+                    <h3 class="mb-0">{{ today_transactions }}</h3>
+                    <small class="text-white-50">Recorded</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Fraud Alerts</h6>
+                    <h3 class="mb-0">{{ active_fraud_alerts }}</h3>
+                    <small class="text-white-50">Active Alerts</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase text-muted">Total Transactions</h6>
+                    <h3 class="mb-0 text-primary">{{ total_transactions }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase text-muted">Transaction Volume</h6>
+                    <h3 class="mb-0 text-success">Rp {{ total_volume|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase text-muted">KYC Pending</h6>
+                    <h3 class="mb-0 text-warning">{{ kyc_pending }}</h3>
+                    <a href="{% url 'admin_kyc_review' %}" class="small">Review KYC →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase text-muted">Support Tickets</h6>
+                    <h3 class="mb-0 text-danger">{{ open_tickets }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt"></i> Recent Transactions
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>Rekening</th>
+                                    <th>Jenis</th>
+                                    <th>Jumlah</th>
+                                    <th>Saldo Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tx in recent_transactions %}
+                                <tr>
+                                    <td><small>{{ tx.created_at|date:'d/m/Y H:i' }}</small></td>
+                                    <td><code>{{ tx.account.account_number }}</code></td>
+                                    <td>{{ tx.get_transaction_type_display }}</td>
+                                    <td><strong>Rp {{ tx.amount|floatformat:0 }}</strong></td>
+                                    <td>Rp {{ tx.balance_after|floatformat:0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        Belum ada transaksi.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <a href="{% url 'admin_kyc_review' %}" class="btn btn-primary">
+                <i class="fas fa-id-card"></i> Review KYC
+            </a>
+            <a href="{% url 'admin_fraud_management' %}" class="btn btn-danger">
+                <i class="fas fa-shield-alt"></i> Manage Fraud Alerts
+            </a>
+            <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

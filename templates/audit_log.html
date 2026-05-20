@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Log - Bank{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-history"></i> Activity Log (Audit Trail)
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Log Aktivitas Anda:</strong> Lihat semua aktivitas yang dilakukan pada akun Anda untuk memantau keamanan.
+                    </div>
+
+                    {% if logs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="fas fa-calendar"></i> Waktu</th>
+                                    <th><i class="fas fa-tasks"></i> Aksi</th>
+                                    <th><i class="fas fa-laptop"></i> Device Info</th>
+                                    <th><i class="fas fa-map-pin"></i> IP Address</th>
+                                    <th><i class="fas fa-badge-check"></i> Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>
+                                        <small>{{ log.created_at|date:'d/m/Y H:i:s' }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ log.get_action_display }}</strong>
+                                        {% if log.description %}
+                                        <br><small class="text-muted">{{ log.description|truncatewords:10 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted text-truncate" style="max-width: 200px;">
+                                            {{ log.user_agent|truncatewords:3 }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <code>{{ log.ip_address }}</code>
+                                    </td>
+                                    <td>
+                                        {% if log.status == 'success' %}
+                                        <span class="badge bg-success">Success</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info text-center" role="alert">
+                        <i class="fas fa-info-circle"></i> Belum ada log aktivitas.
+                    </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Keterangan Status:</h6>
+                            <ul class="small">
+                                <li><span class="badge bg-success">Success</span> - Aktivitas berhasil</li>
+                                <li><span class="badge bg-danger">Failed</span> - Aktivitas gagal</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{% url 'dashboard_nasabah' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

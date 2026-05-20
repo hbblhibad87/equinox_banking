@@ -644,3 +644,97 @@ input[type="text"]::-ms-clear {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
+
+/* ===================== */
+/* Quick Action Buttons  */
+/* ===================== */
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: transparent;
+    color: var(--text-main);
+}
+
+.quick-action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+/* ===================== */
+/* Transaction Badge     */
+/* ===================== */
+.tx-badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: 2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tx-badge-in {
+    background: #dcfce7;
+    color: #065f46;
+}
+
+.tx-badge-out {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+/* ===================== */
+/* Quick Amount Buttons  */
+/* ===================== */
+.quick-amount-btn {
+    padding: 0.35rem 0.875rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border-color);
+    background: #f8fafc;
+    color: var(--text-main);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-amount-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+/* Select form control */
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
